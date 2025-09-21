@@ -1,0 +1,2232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Friend - Your Career Path</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+
+/* Prevent empty scroll caused by 100vh + padding and avoid horizontal overflow */
+html, body { height: 100%; overflow-x: hidden; }
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        .step-card {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        /* Custom transition for smooth step changes */
+        .step-container {
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        .step-hidden {
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            position: absolute;
+            width: 100%;
+        }
+        .step-visible {
+            opacity: 1;
+            transform: translateY(0);
+            position: relative;
+        }
+        /* Custom radio button styles */
+        .role-radio-label {
+            transition: all 0.3s ease;
+        }
+        .role-radio:checked + .role-radio-label {
+            border-color: #4f46e5;
+            background-color: rgba(79, 70, 229, 0.1);
+            color: #4f46e5;
+            font-weight: 600;
+        }
+         /* Custom card hover effect */
+        .choice-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .choice-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
+        @keyframes blob {
+	        0% { transform: translate(0px, 0px) scale(1); }
+	        33% { transform: translate(30px, -50px) scale(1.1); }
+	        66% { transform: translate(-20px, 20px) scale(0.9); }
+	        100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: #6366F1;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4338ca; }
+        
+        /* Feedback Stars */
+        .feedback-stars svg { cursor: pointer; transition: color 0.2s; }
+        
+        /* Video Modal */
+        #video-modal-content { aspect-ratio: 16 / 9; }
+
+        /* Career Tree Graph Styles */
+        .tree { display: flex; justify-content: center; overflow-x: auto; padding-bottom: 20px; }
+        .tree ul { padding-top: 20px; position: relative; transition: all 0.5s; white-space: nowrap; }
+        .tree li { display: inline-block; vertical-align: top; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; transition: all 0.5s; }
+        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #4b5563; width: 50%; height: 20px; }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid #4b5563; }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; }
+        .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid #4b5563; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #4b5563; width: 0; height: 20px; }
+        .tree li .tree-node { border: 2px solid #8b5cf6; padding: 12px 16px; text-decoration: none; color: #e5e7eb; background-color: #1f2937; display: inline-block; border-radius: 8px; transition: all 0.5s; min-width: 180px; max-width: 250px; white-space: normal; }
+        .tree li .tree-node:hover { background: #8b5cf6; color: #fff; }
+        .tree-node .title { font-weight: 700; font-size: 0.9rem; }
+        .tree-node .outcomes, .tree-node .jobs { font-size: 0.8rem; color: #d1d5db; margin-top: 8px; border-top: 1px solid #4b5563; padding-top: 8px; text-align: left; }
+        .tree-node .outcomes ul, .tree-node .jobs ul { list-style-type: disc; padding-left: 1.2rem; }
+        .tree-node .jobs { color: #c4b5fd; }
+        
+        /* Progress Tracker Styles */
+        .task-item.completed p {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        /* Light Theme */
+        .light-theme {
+            background-color: #fefce8; /* Pale yellow */
+            color: #44403c; /* Warm dark gray for text */
+            animation: gradient-animation 20s ease infinite;
+            background-image: linear-gradient(-45deg, #f5f3ff, #fefce8, #faf5ff, #fef9c3);
+            background-size: 400% 400%;
+        }
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .light-theme #theme-background-dark { display: none; }
+        .light-theme .step-card, .light-theme #notification-content, .light-theme #feedback-modal > div, .light-theme #chat-modal {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-color: #e7e5e4;
+            color: #44403c;
+        }
+        .light-theme .text-gray-400 { color: #78716c; }
+        .light-theme input, .light-theme textarea, .light-theme select { background-color: #f5f5f4; border-color: #d6d3d1; color: #1c1917; }
+        .light-theme input::placeholder, .light-theme textarea::placeholder { color: #a8a29e; }
+        .light-theme .role-radio-label { border-color: #d6d3d1; color: #57534e; }
+        .light-theme .role-radio:checked + .role-radio-label { border-color: #a855f7; background-color: #f3e8ff; color: #7e22ce;}
+        .light-theme .bg-gray-700 { background-color: #e7e5e4; }
+        .light-theme .hover\:bg-gray-600:hover { background-color: #d6d3d1; }
+        .light-theme .border-t, .light-theme .border-b { border-color: #e7e5e4; }
+        .light-theme .text-indigo-400 { color: #a855f7; }
+        .light-theme .bg-gray-900\/50 { background-color: #fafaf9; }
+        .light-theme #career-tree-container, .light-theme #step-by-step-guide-content, .light-theme #coaching-content { background-color: #f5f5f4; }
+        .light-theme .tree li::before, .light-theme .tree li::after, .light-theme .tree li:last-child::before, .light-theme .tree li:first-child::after, .light-theme .tree ul ul::before { border-color: #a8a29e; }
+        .light-theme .tree-node { background-color: #ffffff; color: #1c1917; border-color: #a855f7; }
+        .light-theme .tree-node .outcomes, .light-theme .tree-node .jobs { color: #57534e; border-top-color: #d6d3d1; }
+        .light-theme .tree-node .jobs { color: #9333ea; }
+        .light-theme ::-webkit-scrollbar-track { background: #e7e5e4; }
+        .light-theme ::-webkit-scrollbar-thumb { background: #d8b4fe; }
+        .light-theme .text-white { color: #1c1917; }
+        .light-theme .text-gray-300 { color: #57534e; }
+        .light-theme .bg-indigo-600 { background-color: #a855f7; color: #ffffff;}
+        .light-theme .hover\:bg-indigo-700:hover { background-color: #9333ea; color: #ffffff;}
+        .light-theme #chat-fab { color: #ffffff; }
+        .light-theme .text-yellow-300 { color: #ca8a04; }
+        .light-theme .text-red-300 { color: #dc2626; }
+        .light-theme .font-semibold { font-weight: 600; } /* Ensure semibold is dark */
+        .light-theme .task-item.completed p { opacity: 0.7; }
+        .light-theme input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.5); }
+
+
+        /* Confetti */
+        .confetti-piece {
+            position: absolute;
+            width: 8px;
+            height: 16px;
+            background: #ffd300;
+            top: 0;
+            opacity: 0;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+        @keyframes confetti-fall {
+            0% { top: -10%; opacity: 1; transform: rotate(0deg); }
+            100% { top: 110%; opacity: 1; transform: rotate(720deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Background elements -->
+    <div id="theme-background-dark" class="fixed -z-10 inset-0 bg-gradient-to-br from-indigo-900 via-gray-900 to-purple-900 opacity-80">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-purple-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-0 left-1/4 w-72 h-72 bg-pink-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+    </div>
+    
+    <!-- Main Content Wrapper -->
+    <div class="flex items-start justify-center min-h-screen p-4 md:p-6 lg:p-8 w-full box-border">
+    <main id="app-container" class="relative w-full max-w-4xl mx-auto">
+        <!-- Confetti container -->
+        <div id="confetti-container" class="absolute inset-0 pointer-events-none z-50 overflow-hidden"></div>
+        
+        <!-- Step 0: Welcome -->
+        <div id="step-welcome" class="step-container step-visible">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card text-center">
+                 <h1 data-translate="welcome_title" class="text-3xl sm:text-4xl md:text-5xl font-bold mb-2">Welcome to Career Friend</h1>
+                <p data-translate="welcome_subtitle" class="text-gray-400 mb-8">Your personalized career co-pilot.</p>
+                <div class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                    <button onclick="showAuthForm('signin')" data-translate="signin_button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-transform transform hover:scale-105">Sign In</button>
+                    <button onclick="showAuthForm('signup')" data-translate="create_account_button" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-transform transform hover:scale-105">Create an Account</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: Signin Form -->
+        <div id="step-signin-form" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <h1 data-translate="signin_title" class="text-3xl sm:text-4xl font-bold text-center mb-8">Sign In</h1>
+                <div class="space-y-6 max-w-md mx-auto">
+                    <div>
+                        <label for="signin-email" data-translate="email_label" class="text-sm font-medium text-gray-300">Email</label>
+                        <input type="email" id="signin-email" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="you@example.com">
+                    </div>
+                     <div>
+                        <div class="flex justify-between items-center">
+                            <label for="signin-password" data-translate="password_label" class="text-sm font-medium text-gray-300">Password</label>
+                            <a href="#" onclick="handleForgotPassword(event, 'signin-email')" data-translate="forgot_password_link" class="text-sm text-indigo-400 hover:text-indigo-300">Forgot Password?</a>
+                        </div>
+                        <input type="password" id="signin-password" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="••••••••">
+                    </div>
+                    <button onclick="handleLogin()" data-translate="signin_button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-transform transform hover:scale-105">Sign In</button>
+                     <button onclick="showStep('step-welcome')" data-translate="back_button" class="mt-8 text-indigo-400 hover:text-indigo-300 mx-auto block">&larr; Back</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 1.2: Signup Form -->
+        <div id="step-signup-form" class="step-container step-hidden">
+             <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <h1 data-translate="create_account_title" class="text-3xl sm:text-4xl font-bold text-center mb-8">Create Your Account</h1>
+                <div class="space-y-5 max-w-lg mx-auto">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label for="signup-first-name" data-translate="first_name_label" class="text-sm font-medium text-gray-300">First Name</label>
+                            <input type="text" id="signup-first-name" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="John">
+                        </div>
+                        <div>
+                            <label for="signup-last-name" data-translate="last_name_label" class="text-sm font-medium text-gray-300">Last Name</label>
+                            <input type="text" id="signup-last-name" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Doe">
+                        </div>
+                    </div>
+                     <div>
+                        <label for="signup-phone" data-translate="phone_label" class="text-sm font-medium text-gray-300">Phone Number</label>
+                        <input type="tel" id="signup-phone" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="+1 (555) 123-4567">
+                    </div>
+                     <div>
+                        <label for="signup-email" data-translate="email_label" class="text-sm font-medium text-gray-300">Email</label>
+                        <input type="email" id="signup-email" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="you@example.com">
+                    </div>
+                     <div>
+                        <label for="signup-password" data-translate="create_password_label" class="text-sm font-medium text-gray-300">Create Password</label>
+                        <input type="password" id="signup-password" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="••••••••">
+                    </div>
+                    <div>
+                         <label for="signup-country" data-translate="country_label" class="text-sm font-medium text-gray-300">Country</label>
+                        <input type="text" id="signup-country" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="USA">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="terms-agree" class="bg-gray-700 border border-gray-600 rounded text-indigo-500 focus:ring-indigo-500">
+                        <label for="terms-agree" data-translate="terms_agree_label" class="text-sm text-gray-300">I agree to the <a href="#" class="text-indigo-400 hover:underline">Terms & Conditions</a></label>
+                    </div>
+
+                    <button onclick="handleSignup()" data-translate="create_account_button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-transform transform hover:scale-105">Create Account</button>
+                    
+                     <div class="relative flex py-2 items-center">
+                        <div class="flex-grow border-t border-gray-600"></div>
+                        <span class="flex-shrink mx-4 text-gray-400 text-sm">OR</span>
+                        <div class="flex-grow border-t border-gray-600"></div>
+                    </div>
+                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <button onclick="handleGoogleLogin()" class="flex items-center justify-center gap-2 w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg">
+                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C42.022,35.424,44,30.036,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>
+                            Google
+                        </button>
+                        <button onclick="handleAppleLogin()" class="flex items-center justify-center gap-2 w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg">
+                           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M27.21,14.52c0.17-2.3-1.6-3.88-3.66-3.93-1.83-.04-3.53,1.23-4.47,2.21-0.87,0.9-1.63,2.25-2.04,2.25s-0.79-1.04-1.97-2.13c-1.12-1.03-2.6-2.4-4.24-2.35-2.24,0.08-4.04,1.86-4.04,4.35,0,2.94,2.36,6.64,4.27,8.73,0.96,1.06,2.02,2.26,3.47,2.24,1.41-0.02,1.83-0.69,3.58-0.72s2.07,0.09,3.5-0.04c1.55-0.14,2.54-0.9,3.46-2.1,1.1-1.42,1.98-3.4,2.05-3.56-0.04-.02-3.4-1.35-3.4-5.24Zm-10.63,12.5c0.04,0,0.1,0,0.14,0,0.92-0.16,2.2-0.72,3.12-0.75,1,0,1.96,0.52,2.9,0.6,0.11,0.01,0.22,0.02,0.33,0.02,1.25,0,2.26-0.74,2.95-1.92-0.79-0.52-1.81-1.2-2.99-1.25-0.96-0.04-2.02,0.56-2.92,0.56s-1.82-0.64-2.9-0.66c-1.22-0.03-2.33,0.67-3.13,1.35,0.73,1.26,1.75,2.03,3.01,2.07,0.1,0,0.2,0.01,0.29,0.01Z"></path></svg>
+                            Apple
+                        </button>
+                    </div>
+
+                    <button onclick="showStep('step-welcome')" data-translate="back_button" class="mt-8 text-indigo-400 hover:text-indigo-300 mx-auto block">&larr; Back</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1.5: User Details (for social logins) -->
+        <div id="step-details" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2">Complete Your Profile</h2>
+                <p class="text-gray-400 text-center mb-8">Just a few more details to get started.</p>
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="first-name" class="text-sm font-medium text-gray-300">First Name</label>
+                            <input type="text" id="first-name" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="John">
+                        </div>
+                        <div>
+                            <label for="last-name" class="text-sm font-medium text-gray-300">Last Name</label>
+                            <input type="text" id="last-name" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Doe">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="phone" class="text-sm font-medium text-gray-300">Phone Number</label>
+                        <input type="tel" id="phone" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="+1 (555) 123-4567">
+                    </div>
+                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="country" class="text-sm font-medium text-gray-300">Country</label>
+                            <input type="text" id="country" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="USA">
+                        </div>
+                        <div>
+                            <label for="state" class="text-sm font-medium text-gray-300">State</label>
+                            <input type="text" id="state" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="California">
+                        </div>
+                        <div>
+                            <label for="district" class="text-sm font-medium text-gray-300">District / City</label>
+                            <input type="text" id="district" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Los Angeles">
+                        </div>
+                    </div>
+                    <button onclick="handleDetailsSubmit()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-transform transform hover:scale-105">Continue</button>
+                </div>
+                 <button onclick="showStep('step-signup-form')" class="mt-8 text-indigo-400 hover:text-indigo-300">&larr; Go Back</button>
+            </div>
+        </div>
+
+        <!-- New Step 1.75: Home Page -->
+        <div id="step-home" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card relative">
+                <button onclick="showStep('step-settings')" class="absolute top-6 right-6 text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                </button>
+                <div class="flex flex-col sm:flex-row items-center gap-4 mb-8 text-center sm:text-left">
+                    <div class="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center border-2 border-gray-600 cursor-pointer flex-shrink-0" onclick="showNotification('Profile picture feature coming soon!')">
+                        <span class="text-3xl">👤</span>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold">Welcome, <span id="home-username" class="text-indigo-400"></span>!</h2>
+                        <p class="text-gray-400">Ready to discover your future?</p>
+                    </div>
+                </div>
+
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700 flex flex-col items-center text-center">
+                        <div class="text-4xl mb-3">🧭</div>
+                        <h3 class="font-bold text-xl mb-2">Explore Your Path</h3>
+                        <p class="text-gray-400 text-sm mb-4">Get personalized career insights.</p>
+                        <button onclick="showStep('step-class')" class="mt-auto w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-transform transform hover:scale-105">Start Journey</button>
+                    </div>
+                     <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700 flex flex-col items-center text-center">
+                        <div class="text-4xl mb-3">🤝</div>
+                        <h3 class="font-bold text-xl mb-2">
+                             <span class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-500">Your Networks</span>
+                        </h3>
+                        <p class="text-gray-400 text-sm mb-4">Connect with peers and mentors.</p>
+                        <button onclick="showStep('step-friends')" class="mt-auto w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-transform transform hover:scale-105">Find Friends</button>
+                    </div>
+                    <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700 flex flex-col items-center text-center">
+                        <div class="text-4xl mb-3">📊</div>
+                        <h3 class="font-bold text-xl mb-2">Activity Center</h3>
+                        <p class="text-gray-400 text-sm mb-4">Review your progress and activity.</p>
+                        <button onclick="showStep('step-activity-center')" class="mt-auto w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-transform transform hover:scale-105">View Center</button>
+                    </div>
+                    <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700 flex flex-col items-center text-center">
+                        <div class="text-4xl mb-3">🎯</div>
+                        <h3 class="font-bold text-xl mb-2">Progress Tracker</h3>
+                        <p class="text-gray-400 text-sm mb-4">Set goals and track your tasks.</p>
+                        <button onclick="showStep('step-progress-tracker')" class="mt-auto w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-transform transform hover:scale-105">Set Goals</button>
+                    </div>
+                </div>
+
+                <!-- Learning Hub - shows after path is selected -->
+                <div id="learning-hub-container" class="mt-10 hidden">
+                    <h3 class="text-xl sm:text-2xl font-bold mb-4">Your Personalized Learning Hub</h3>
+                    <div id="learning-hub-content" class="space-y-6">
+                        <!-- AI Generated resources will be injected here -->
+                    </div>
+                </div>
+
+
+                <div class="mt-10">
+                    <h3 class="text-xl sm:text-2xl font-bold mb-4">What's Trending Near You</h3>
+                    <div id="recommendations-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Recommendations will be populated here -->
+                    </div>
+                </div>
+
+                <div class="mt-10 p-6 bg-gray-900/50 rounded-lg border border-gray-700 text-center">
+                    <h3 class="text-xl sm:text-2xl font-bold mb-4">Connect with an Expert</h3>
+                    <p class="text-gray-400 mb-6">Can't find what you're looking for? Search for an expert in any field worldwide.</p>
+                    <div class="flex flex-col sm:flex-row gap-2 max-w-lg mx-auto">
+                        <input type="search" id="expert-search-input" class="w-full flex-grow bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="e.g., Quantum Physics, Marine Biology...">
+                        <button onclick="handleExpertConnect()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-transform transform hover:scale-105">Connect</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Friends/Networks Page -->
+        <div id="step-friends" class="step-container step-hidden">
+             <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-8">Your Network</h2>
+                <div id="friends-list" class="space-y-4 max-w-2xl mx-auto">
+                    <!-- Dummy friends will be populated here -->
+                </div>
+                <button onclick="showStep('step-home')" class="mt-8 text-indigo-400 hover:text-indigo-300 mx-auto block">&larr; Back to Home</button>
+            </div>
+        </div>
+
+        <!-- Helpdesk Page -->
+        <div id="step-helpdesk" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2">Help & Support Center</h2>
+                <p class="text-gray-400 text-center mb-8">Have a problem or a question? Submit a ticket and we'll get back to you.</p>
+
+                <div class="max-w-xl mx-auto">
+                    <!-- Submit Ticket Form -->
+                    <form onsubmit="handleHelpdeskSubmit(event)" class="bg-gray-900/50 p-4 rounded-lg border border-gray-700 mb-6 space-y-4">
+                        <h3 class="font-semibold text-lg">Create a New Ticket</h3>
+                        <div>
+                            <label for="help-topic" class="text-sm font-medium text-gray-300">Topic</label>
+                            <select id="help-topic" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                                <option>Technical Issue</option>
+                                <option>Feedback & Suggestions</option>
+                                <option>Billing Inquiry</option>
+                                <option>General Question</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="help-message" class="text-sm font-medium text-gray-300">Please describe your issue</label>
+                            <textarea id="help-message" rows="4" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Provide as much detail as possible..."></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-transform transform hover:scale-105">Submit Ticket</button>
+                    </form>
+
+                    <!-- Ticket History -->
+                    <div>
+                        <h3 class="font-semibold text-lg mb-4">Your Ticket History</h3>
+                        <div id="ticket-history-list" class="space-y-3 max-h-[250px] overflow-y-auto pr-2">
+                            <!-- Ticket history will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="showStep('step-settings')" class="mt-8 text-indigo-400 hover:text-indigo-300 mx-auto block">&larr; Back to Settings</button>
+            </div>
+        </div>
+
+        <!-- Progress Tracker Page -->
+        <div id="step-progress-tracker" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2">Your Progress Tracker</h2>
+                <p class="text-gray-400 text-center mb-8">Add your goals and stay on track.</p>
+
+                <div class="max-w-xl mx-auto">
+                    <!-- Add Task Form -->
+                    <div class="bg-gray-900/50 p-4 rounded-lg border border-gray-700 mb-6">
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <input type="text" id="new-task-input" class="w-full flex-grow bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Enter a new task or goal...">
+                            <input type="date" id="new-task-date" class="bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                            <button onclick="addTask()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 whitespace-nowrap">Add Task</button>
+                        </div>
+                    </div>
+
+                    <!-- Task List -->
+                    <div id="task-list" class="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                        <!-- Tasks will be rendered here by JS -->
+                    </div>
+                </div>
+
+                <button onclick="showStep('step-home')" class="mt-8 text-indigo-400 hover:text-indigo-300 mx-auto block">&larr; Back to Home</button>
+            </div>
+        </div>
+
+
+        <!-- Settings Page -->
+        <div id="step-settings" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-8">Settings</h2>
+                <div class="space-y-4 max-w-md mx-auto">
+                    <div class="p-4 bg-gray-700/50 rounded-lg flex items-center justify-between">
+                        <h3 class="font-semibold">Dark Mode</h3>
+                        <label for="dark-mode-toggle" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="dark-mode-toggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-4 peer-focus:ring-indigo-500/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        </label>
+                    </div>
+                     <div class="p-4 bg-gray-700/50 rounded-lg">
+                        <h3 class="font-semibold mb-3">Language</h3>
+                        <select onchange="applyLanguage(this.value)" id="language-select" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                            <option value="en-IN">English (IN)</option>
+                            <option value="en-US">English (US)</option>
+                            <option value="hi">Hindi (हिन्दी)</option>
+                            <option value="hi-en">Hinglish</option>
+                        </select>
+                    </div>
+                    <button onclick="openEditProfile()" class="w-full text-left p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition">Edit Profile</button>
+                    <button onclick="handleSettingClick('share')" class="w-full text-left p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition">Share User ID (QR)</button>
+                    <button onclick="handleSettingClick('help')" class="w-full text-left p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition">Ask Question from Help Team</button>
+                    <button onclick="handleSettingClick('password')" class="w-full text-left p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition">Forgot Password</button>
+                    <button onclick="handleLogout()" class="w-full text-left p-4 bg-indigo-900/40 hover:bg-indigo-900/60 text-indigo-300 rounded-lg transition font-semibold">Logout</button>
+                    <button onclick="handleSettingClick('deactivate')" class="w-full text-left p-4 bg-yellow-900/30 hover:bg-yellow-900/50 text-yellow-300 rounded-lg transition">Deactivate Account (15 days)</button>
+                    <button onclick="handleSettingClick('delete')" class="w-full text-left p-4 bg-red-900/30 hover:bg-red-900/50 text-red-300 rounded-lg transition">Delete Account Permanently</button>
+                </div>
+                <button onclick="showStep('step-home')" class="mt-8 text-indigo-400 hover:text-indigo-300 mx-auto block">&larr; Back to Home</button>
+            </div>
+        </div>
+
+        <!-- Edit Profile Page -->
+        <div id="step-edit-profile" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2">Edit Your Profile</h2>
+                <p class="text-gray-400 text-center mb-8">You can update your details once every 30 days.</p>
+                <form onsubmit="handleProfileUpdate(event)" class="space-y-6 max-w-lg mx-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="edit-first-name" class="text-sm font-medium text-gray-300">First Name</label>
+                            <input type="text" id="edit-first-name" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                        </div>
+                        <div>
+                            <label for="edit-last-name" class="text-sm font-medium text-gray-300">Last Name</label>
+                            <input type="text" id="edit-last-name" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                        </div>
+                    </div>
+                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="edit-country" class="text-sm font-medium text-gray-300">Country</label>
+                            <input type="text" id="edit-country" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                        </div>
+                        <div>
+                            <label for="edit-state" class="text-sm font-medium text-gray-300">State</label>
+                            <input type="text" id="edit-state" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                        </div>
+                        <div>
+                            <label for="edit-district" class="text-sm font-medium text-gray-300">District / City</label>
+                            <input type="text" id="edit-district" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-transform transform hover:scale-105">Save Changes</button>
+                </form>
+                 <button onclick="showStep('step-settings')" class="mt-8 text-indigo-400 hover:text-indigo-300 mx-auto block">&larr; Back to Settings</button>
+            </div>
+        </div>
+
+
+        <!-- Step 2: Choose Class -->
+        <div id="step-class" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2">Hello there!</h2>
+                <p class="text-gray-400 text-center mb-8">Let's start by choosing your current academic stage.</p>
+                <div id="class-options" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <!-- Class options will be inserted here by JS -->
+                </div>
+                 <button onclick="showStep('step-home')" class="mt-8 text-indigo-400 hover:text-indigo-300">&larr; Go Back to Home</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Stream Selection -->
+        <div id="step-stream" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2">Great! Now, pick your stream.</h2>
+                <p class="text-gray-400 text-center mb-8">Which path are you on? This helps us narrow down the options.</p>
+                <div id="stream-options" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <!-- Stream options will be inserted here by JS -->
+                </div>
+                 <button onclick="showStep('step-class')" class="mt-8 text-indigo-400 hover:text-indigo-300">&larr; Go Back</button>
+            </div>
+        </div>
+
+        <!-- Step 4: User Feedback -->
+        <div id="step-feedback" class="step-container step-hidden">
+             <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2">How do you feel about this path?</h2>
+                <p class="text-gray-400 text-center mb-8">Be honest! Your feelings matter in this journey.</p>
+                <div id="feedback-options" class="flex justify-center items-center gap-4 md:gap-8 flex-wrap">
+                    <!-- Feedback options will be inserted here by JS -->
+                </div>
+                <button onclick="showStep('step-stream')" class="mt-8 text-indigo-400 hover:text-indigo-300">&larr; Go Back</button>
+            </div>
+        </div>
+        
+        <!-- Step 5: Interest and Inspiration -->
+        <div id="step-interest" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2">Tell Us a Bit More</h2>
+                <p class="text-gray-400 text-center mb-8">What sparks your curiosity?</p>
+                <div class="space-y-6">
+                    <div>
+                        <label for="interests" class="text-sm font-medium text-gray-300">What are your interests or hobbies related to this field?</label>
+                        <textarea id="interests" rows="3" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="e.g., building things, solving puzzles, creative writing..."></textarea>
+                    </div>
+                    <div>
+                        <label for="inspiration" class="text-sm font-medium text-gray-300">Who or what is your inspiration for choosing this path?</label>
+                        <textarea id="inspiration" rows="3" class="w-full mt-2 bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="e.g., a family member, a famous scientist, a movie..."></textarea>
+                    </div>
+                    <button onclick="showStep('step-activation')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-transform transform hover:scale-105">Continue</button>
+                </div>
+                <button onclick="showStep('step-feedback')" class="mt-8 text-indigo-400 hover:text-indigo-300">&larr; Go Back</button>
+            </div>
+        </div>
+
+        <!-- Step 6: Path Activation -->
+        <div id="step-activation" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-2">You're All Set!</h2>
+                <p class="text-gray-400 mb-8">Here's a summary of your chosen path. Ready to explore the possibilities?</p>
+                <div class="text-left bg-gray-900/50 p-6 rounded-lg mb-8 space-y-2 border border-gray-700">
+                    <p><strong>Your Stage:</strong> <span id="summary-class" class="text-gray-300 font-medium"></span></p>
+                    <p><strong>Your Path:</strong> <span id="summary-stream" class="text-gray-300 font-medium"></span></p>
+                    <p><strong>Your Vibe:</strong> <span id="summary-feeling" class="text-gray-300 font-medium"></span></p>
+                </div>
+                <button onclick="generateAndShowFinalStep()" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 shadow-lg shadow-green-500/20">✨ Activate Path & Get AI Insights</button>
+                <button onclick="showStep('step-interest')" class="mt-8 text-indigo-400 hover:text-indigo-300 block">&larr; Go Back</button>
+            </div>
+        </div>
+
+        <!-- Step 7: Final Advice -->
+        <div id="step-final" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <div class="flex items-center justify-center mb-2 flex-wrap gap-2">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-center">Your AI-Powered Career Path: <span id="final-path-title" class="text-indigo-400"></span></h2>
+                    <button id="browser-tts-button" onclick="readSummaryWithBrowser()" class="p-2 bg-indigo-600 rounded-full hover:bg-indigo-700 text-white transition-transform transform hover:scale-110" title="Read summary aloud">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707a1 1 0 011.414 0v14.414a1 1 0 01-1.414 0L5.586 15z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <p class="text-gray-400 mb-6 text-center">Here's a personalized breakdown of your journey, generated by our AI career counselor.</p>
+                <div id="final-details" class="space-y-4 text-gray-300 bg-gray-900/50 p-6 rounded-lg border border-gray-700 min-h-[250px]">
+                    <!-- AI content will be inserted here -->
+                </div>
+                
+                <!-- New AI Step-by-Step Guide Section -->
+                <div id="step-by-step-guide-section" class="mt-8 hidden">
+                     <h3 class="text-xl sm:text-2xl font-bold text-center mb-4">Your AI Step-by-Step Guide</h3>
+                     <div id="step-by-step-guide-content" class="bg-gray-900/50 p-4 rounded-lg border border-gray-700">
+                         <!-- Guide content will be injected here -->
+                     </div>
+                </div>
+
+                 <!-- New Career Path Tree Section -->
+                <div id="career-path-tree-section" class="mt-8 hidden">
+                    <h3 class="text-xl sm:text-2xl font-bold text-center mb-4">Your Career Roadmap</h3>
+                    <div id="career-tree-container" class="bg-gray-900/50 p-4 rounded-lg border border-gray-700 overflow-x-auto">
+                        <!-- Career tree will be dynamically generated here -->
+                    </div>
+                    <div class="text-center mt-4">
+                        <button onclick="downloadCareerTree()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-transform transform hover:scale-105">
+                            Download as Image
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- New Coaching Section -->
+                <div id="coaching-section" class="mt-8 hidden">
+                     <h3 class="text-xl sm:text-2xl font-bold text-center mb-4">Top Coaching & Institutes</h3>
+                     <div id="coaching-content" class="bg-gray-900/50 p-4 rounded-lg border border-gray-700">
+                         <!-- Coaching content will be injected here -->
+                     </div>
+                </div>
+                
+                 <!-- New Day in the Life Section -->
+                <div class="mt-8 p-6 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg text-center">
+                    <h3 class="text-xl font-bold text-white">Experience Your Future</h3>
+                    <p class="mt-1 mb-5 text-white/80">Try our AI simulation to see what a day in your chosen career is really like.</p>
+                     <button onclick="startDayInLifeSimulation()" class="bg-white text-purple-600 font-semibold py-2.5 px-6 rounded-lg hover:bg-gray-200 transition-transform transform hover:scale-105">✨ Live a Day in the Life</button>
+                </div>
+
+                <div class="mt-8 p-6 bg-gradient-to-r from-gray-700 to-gray-800 border border-gray-600 rounded-lg text-center">
+                    <h3 class="text-xl font-bold text-white">Track Your Progress</h3>
+                    <p class="mt-1 mb-5 text-white/80">Review your journey and decisions so far.</p>
+                     <button onclick="showStep('step-activity-center')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-transform transform hover:scale-105">📊 View Activity Center</button>
+                </div>
+
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-6 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-lg text-center">
+                        <h3 class="text-xl font-bold text-white">Connect & Grow</h3>
+                        <p class="mt-1 mb-5 text-white/80">Talk to peers or get advice from experienced mentors.</p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button onclick="showStep('step-community-hub')" class="bg-white text-teal-600 font-semibold py-2.5 px-6 rounded-lg hover:bg-gray-200 transition-transform transform hover:scale-105">👥 Community</button>
+                            <button onclick="showStep('step-mentors')" class="bg-white/20 border-2 border-white text-white font-semibold py-2.5 px-6 rounded-lg hover:bg-white hover:text-cyan-600 transition-colors">🎓 Mentors</button>
+                        </div>
+                    </div>
+                    
+                     <div class="p-6 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-center">
+                        <h3 class="text-xl font-bold text-white">Prepare for Future</h3>
+                        <p class="mt-1 mb-5 text-white/80">Practice common interview questions for your field.</p>
+                        <button id="interview-btn" onclick="generateInterviewQuestions()" class="bg-white text-indigo-600 font-semibold py-2.5 px-6 rounded-lg hover:bg-gray-200 transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">✨ Get Questions</button>
+                    </div>
+                </div>
+
+                <div id="interview-questions-container" class="mt-4 hidden">
+                    <!-- Interview questions will be inserted here -->
+                </div>
+                
+                <button onclick="showStep('step-home')" class="mt-8 w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg shadow-indigo-500/50 flex items-center justify-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    <span>Back to Home</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Day in the Life Simulation Page -->
+        <div id="step-simulation" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2">A Day in the Life of a <span id="simulation-role-title" class="text-indigo-400"></span></h2>
+                <div id="simulation-content" class="mt-6 bg-gray-900/50 p-6 rounded-lg border border-gray-700 min-h-[200px]">
+                    <!-- Simulation story will be injected here -->
+                </div>
+                <div id="simulation-choices" class="mt-6 grid grid-cols-1 gap-4">
+                    <!-- Simulation choices will be injected here -->
+                </div>
+                 <button onclick="showStep('step-final')" class="mt-8 text-indigo-400 hover:text-indigo-300 mx-auto block">&larr; Back to My Path</button>
+            </div>
+        </div>
+
+        <!-- Community Hub -->
+        <div id="step-community-hub" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2">Community Hub</h2>
+                <p class="text-gray-400 text-center mb-8">Join a discussion room to chat with others on a similar path.</p>
+                <div id="community-rooms" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Community rooms will be inserted here -->
+                </div>
+                <button onclick="showStep('step-final')" class="mt-8 text-indigo-400 hover:text-indigo-300">&larr; Back to My Path</button>
+            </div>
+        </div>
+        
+        <!-- Chat Room -->
+        <div id="step-chat-room" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl shadow-2xl step-card flex flex-col h-[85vh] max-h-[650px]">
+                <div class="flex items-center justify-between p-4 border-b border-gray-700">
+                    <h3 id="chat-room-title" class="font-bold text-lg text-center"></h3>
+                     <button onclick="leaveChatRoom()" class="text-sm bg-red-600/50 text-red-200 hover:bg-red-600/80 px-3 py-1 rounded-md">Leave Chat</button>
+                </div>
+                <div id="chat-room-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-900/50">
+                    <!-- Chat messages will appear here -->
+                </div>
+                <div class="p-4 border-t border-gray-700">
+                    <form onsubmit="sendCommunityMessage(event)" class="flex flex-col gap-3">
+                        <textarea id="chat-room-input" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white outline-none focus:ring-2 focus:ring-indigo-500" rows="2" placeholder="Share your thoughts..."></textarea>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 text-sm text-gray-400">
+                                <input type="checkbox" id="anonymous-toggle" class="bg-gray-700 border border-gray-600 rounded text-indigo-500 focus:ring-indigo-500">
+                                <label for="anonymous-toggle">Post anonymously</label>
+                            </div>
+                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-5 rounded-lg">Send</button>
+                        </div>
+                    </form>
+                </div>
+                <button onclick="showStep('step-community-hub')" class="text-indigo-400 hover:text-indigo-300 p-4">&larr; Back to Hub</button>
+            </div>
+        </div>
+
+        <!-- Mentors Page -->
+        <div id="step-mentors" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2">Connect with a Mentor</h2>
+                <p class="text-gray-400 text-center mb-8">Get personalized advice from industry experts.</p>
+                <div id="mentor-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Mentor cards will be inserted here -->
+                </div>
+                <button onclick="showStep('step-final')" class="mt-8 text-indigo-400 hover:text-indigo-300">&larr; Back to My Path</button>
+            </div>
+        </div>
+
+        <!-- Activity Center Page -->
+        <div id="step-activity-center" class="step-container step-hidden">
+            <div class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl step-card">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-bold mb-1">Your Activity Center</h2>
+                        <p class="text-gray-400">Here's a log of your journey with Cusees, <span id="activity-center-username" class="font-semibold text-indigo-400"></span>.</p>
+                    </div>
+                    <button onclick="showStep('step-home')" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-transform transform hover:scale-105 whitespace-nowrap">🏠 Go to Home</button>
+                </div>
+                <div id="activity-center-feed" class="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                    <!-- Activity feed will be populated here -->
+                </div>
+                 <button onclick="showStep('step-final')" class="mt-8 text-indigo-400 hover:text-indigo-300">&larr; Back to My Path</button>
+            </div>
+        </div>
+
+        <!-- Notification Modal -->
+        <div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden transition-opacity duration-300">
+            <div id="notification-content" class="bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-sm w-full text-center border border-gray-700">
+                <p id="notification-message" class="text-lg text-gray-200 mb-6"></p>
+                <button onclick="hideNotification()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-8 rounded-lg transition-transform transform hover:scale-105">OK</button>
+            </div>
+        </div>
+
+        <!-- Feedback Modal -->
+        <div id="feedback-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden transition-opacity duration-300">
+            <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-md w-full border border-gray-700">
+                <h3 class="text-2xl font-bold text-center mb-4">How was your experience?</h3>
+                <p class="text-gray-400 text-center mb-6">Your feedback helps us improve.</p>
+                <div class="flex justify-center items-center gap-2 mb-6 feedback-stars" id="feedback-stars-container">
+                    <!-- Stars will be injected here -->
+                </div>
+                <textarea id="feedback-text" rows="3" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Any additional comments?"></textarea>
+                <div class="flex justify-center gap-4 mt-6">
+                    <button onclick="hideFeedbackModal()" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-8 rounded-lg">Skip</button>
+                    <button onclick="submitFeedback()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-8 rounded-lg">Submit</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Player Modal -->
+        <div id="video-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden transition-opacity duration-300">
+            <div class="relative w-full max-w-3xl">
+                 <button onclick="closeVideoPlayer()" class="absolute -top-10 right-0 text-white text-4xl font-bold">&times;</button>
+                 <div id="video-modal-content" class="bg-black rounded-lg overflow-hidden shadow-2xl w-full">
+                    <iframe id="youtube-player" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                 </div>
+            </div>
+        </div>
+
+    </main>
+
+     <!-- Floating Chat Button -->
+    <button onclick="openChat()" id="chat-fab" class="fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-4 shadow-lg transition-transform transform hover:scale-110 z-40">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10c1.89 0 3.63-.522 5.094-1.428.375.581.84 1.107 1.38 1.56a1 1 0 001.414-1.414c-.453-.44-1.025-.99-1.56-1.38A9.934 9.934 0 0022 12c0-5.514-4.486-10-10-10zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/><path d="M14.5 10.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM9.5 10.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM12 14c-2.481 0-4.5 1.567-4.5 3.5a.5.5 0 001 0c0-1.433 1.519-2.5 3.5-2.5s3.5 1.067 3.5 2.5a.5.5 0 001 0c0-1.933-2.019-3.5-4.5-3.5z"/></svg>
+    </button>
+
+    <!-- Chat Modal -->
+    <div id="chat-modal" class="fixed bottom-28 right-8 w-[90vw] max-w-md h-[75vh] bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl flex-col z-50 transition-all duration-300 transform translate-y-10 opacity-0 hidden">
+        <div class="flex items-center justify-between p-4 border-b border-gray-700">
+            <h3 class="font-bold text-lg">Chat with Career Friend AI</h3>
+            <button onclick="closeChat()" class="text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
+        </div>
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-900/50">
+            <!-- Messages will be appended here -->
+             <div class="p-3 rounded-lg bg-indigo-600 text-white self-start max-w-xs break-words">
+                Hi! I'm Career Friend, your AI career assistant. How can I help you today?
+            </div>
+        </div>
+         <div id="chat-loader" class="p-4 hidden">
+            <div class="flex items-center gap-2">
+                <div class="loader !w-5 !h-5 !border-4 !border-white !border-bottom-color-transparent"></div>
+                <span class="text-sm text-gray-400">Career Friend is thinking...</span>
+            </div>
+        </div>
+        <div class="p-4 border-t border-gray-700">
+            <form onsubmit="sendChatMessage(event)" class="flex gap-2">
+                <input id="chat-input" type="text" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ask about careers...">
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg">Send</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        // --- DATA STORE ---
+        const careerData = {
+            classes: [
+                { id: '10th', name: 'After 10th', icon: '🎓' },
+                { id: '12th', name: 'After 12th', icon: '📚' },
+                { id: 'btech', name: 'B.Tech', icon: '💻' },
+                { id: 'commerce_grad', name: 'Commerce Grad', icon: '📈' },
+                { id: 'arts_grad', name: 'Arts Grad', icon: '🎨' },
+                { id: 'pg', name: 'Post-Grad', icon: '🏛️' },
+            ],
+            streams: {
+                '10th': [
+                    { id: 'science', name: 'Science', details: { exams: 'Focus on school exams, Olympiads (NTSE, KVPY).', careers: 'Foundation for Engineering, Medical, Research, and more.', skills: 'Problem-solving, analytical thinking.' } },
+                    { id: 'commerce', name: 'Commerce', details: { exams: 'Focus on school exams, Commerce Olympiads.', careers: 'Foundation for CA, CS, Business, Finance.', skills: 'Numeracy, business acumen.' } },
+                    { id: 'arts', name: 'Arts/Humanities', details: { exams: 'Focus on school exams, Social Science Olympiads.', careers: 'Foundation for Civil Services, Law, Journalism, Design.', skills: 'Critical thinking, communication.' } },
+                    { id: 'diploma', name: 'Diploma/Vocational', details: { exams: 'State Polytechnic Entrance Tests (POLYCET).', careers: 'Direct entry into technical jobs (Electrician, Mechanic) or lateral entry into B.Tech.', skills: 'Hands-on practical skills.' } },
+                ],
+                '12th': [
+                    { id: 'engineering', name: 'Engineering (PCM)', details: { exams: 'JEE Mains & Advanced, BITSAT, VITEEE, State CETs.', careers: 'Software Engineer, Data Scientist, AI Specialist, Mechanical, Civil, Electrical Eng.', skills: 'Coding (Python, C++), Data Analysis, Cloud Certifications (AWS, Azure).' } },
+                    { id: 'medical', name: 'Medical (MBBS, BDS, etc.)', details: { exams: 'NEET is the primary exam for MBBS, BDS, BAMS, etc.', careers: 'Doctor, Surgeon, Dentist, Pharmacist, Researcher, Veterinarian.', skills: 'Empathy, precision, research methodologies.' } },
+                    { id: 'commerce_prof', name: 'Commerce (Professional)', details: { exams: 'CA Foundation, CS Foundation, CMA Foundation.', careers: 'Chartered Accountant (CA), Company Secretary (CS), Auditor, CFO.', skills: 'Financial modeling, tax laws, corporate governance.' } },
+                    { id: 'business_mgmt', name: 'Business & Management', details: { exams: 'CUET, IPMAT (IIMs), NPAT, SET.', careers: 'Business Analyst, Manager, Marketing Head, Entrepreneur.', skills: 'Digital Marketing, Stock Market Analysis, Leadership.' } },
+                    { id: 'law', name: 'Law', details: { exams: 'CLAT, AILET, LSAT for 5-year integrated BA-LLB.', careers: 'Corporate Lawyer, Judge, Legal Consultant, Public Prosecutor.', skills: 'Debating, legal research, logical reasoning.' } },
+                    { id: 'civil_services', name: 'Civil Services & Humanities', details: { exams: 'Start preparing for UPSC/State PSC after graduation.', careers: 'IAS, IPS, IFS, Historian, Psychologist, Researcher.', skills: 'General knowledge, writing, public speaking.' } },
+                    { id: 'other', name: 'Not Listed / Other', details: { exams: '', careers: 'Get personalized help from our AI assistant.', skills: '' } }
+                ],
+                'btech': [
+                    { id: 'software_dev', name: 'Software Development', details: { exams: 'GATE (for M.Tech), GRE (for MS abroad), Company-specific tests.', careers: 'SDE, Full Stack Developer, DevOps Engineer, Cloud Architect.', skills: 'Advanced Algorithms, System Design, Cloud Computing (AWS, Azure), Containerization (Docker, Kubernetes).' } },
+                    { id: 'data_science', name: 'Data Science & AI/ML', details: { exams: 'GATE, specialized certs.', careers: 'Data Scientist, ML Engineer, AI Researcher, Data Analyst.', skills: 'Python, R, TensorFlow, PyTorch, Big Data technologies (Spark, Hadoop).' } },
+                    { id: 'mechanical', name: 'Mechanical Engineering', details: { exams: 'GATE, ESE (Engineering Services Examination).', careers: 'Automotive Engineer, Aerospace Engineer, Manufacturing Head, Robotics Engineer.', skills: 'CAD/CAM software (AutoCAD, SolidWorks), Thermodynamics, Fluid Mechanics, 3D Printing.' } },
+                    { id: 'civil', name: 'Civil Engineering', details: { exams: 'GATE, ESE, State PSCs.', careers: 'Structural Engineer, Urban Planner, Construction Manager, Environmental Engineer.', skills: 'AutoCAD, STAAD.Pro, Project Management, Surveying techniques.' } },
+                    { id: 'electrical', name: 'Electrical Engineering', details: { exams: 'GATE, ESE, Power Grid exams.', careers: 'Power Systems Engineer, Control Systems Engineer, VLSI Design Engineer.', skills: 'MATLAB, Simulink, VHDL/Verilog, Embedded Systems.' } },
+                    { id: 'ece', name: 'Electronics & Communication', details: { exams: 'GATE, ISRO/DRDO exams.', careers: 'Telecommunication Engineer, Network Engineer, VLSI Engineer, Embedded Systems Developer.', skills: 'VHDL, Verilog, Signal Processing, Microcontrollers.' } },
+                    { id: 'chemical', name: 'Chemical Engineering', details: { exams: 'GATE, PSUs like IOCL, BPCL.', careers: 'Process Engineer, Production Engineer, Safety Manager in refineries, pharma, FMCG.', skills: 'ASPEN Plus, Process Simulation, Chemical Reaction Engineering.' } },
+                    { id: 'aerospace', name: 'Aerospace Engineering', details: { exams: 'GATE, ISRO/DRDO/HAL exams.', careers: 'Aeronautical Engineer, Spacecraft Designer, Propulsion Engineer.', skills: 'Computational Fluid Dynamics (CFD), CATIA, MATLAB, Aerodynamics.' } },
+                    { id: 'other', name: 'Not Listed / Other', details: { exams: '', careers: 'Get personalized help from our AI assistant.', skills: '' } }
+                ],
+                 'commerce_grad': [
+                    { id: 'mba', name: 'MBA (Finance/Marketing)', details: { exams: 'CAT, XAT, GMAT.', careers: 'Investment Banker, Management Consultant, Brand Manager.', skills: 'Financial Analysis, Strategic Planning.' } },
+                    { id: 'cfa_frm', name: 'CFA / FRM', details: { exams: 'CFA Level 1, FRM Part 1.', careers: 'Financial Analyst, Risk Manager.', skills: 'Portfolio Management, Risk Assessment.' } },
+                    { id: 'other', name: 'Not Listed / Other', details: { exams: '', careers: 'Get personalized help from our AI assistant.', skills: '' } }
+                ],
+                'arts_grad': [
+                     { id: 'upsc', name: 'UPSC Civil Services', details: { exams: 'UPSC CSE.', careers: 'IAS, IPS, IFS officer.', skills: 'In-depth subject knowledge, answer writing.' } },
+                     { id: 'journalism', name: 'Journalism / Media', details: { exams: 'IIMC Entrance, ACJ Entrance.', careers: 'Journalist, Editor, Content Strategist.', skills: 'Video Editing, Digital Media.' } },
+                     { id: 'other', name: 'Not Listed / Other', details: { exams: '', careers: 'Get personalized help from our AI assistant.', skills: '' } }
+                ],
+                'pg': [
+                     { id: 'phd', name: 'PhD / Research', details: { exams: 'UGC-NET, CSIR-NET, GATE.', careers: 'Professor, Research Scientist.', skills: 'Academic Writing, Statistical Analysis.' } },
+                     { id: 'postdoc', name: 'Post-Doctoral Fellowship', details: { exams: 'Based on research proposals.', careers: 'Senior Researcher, Academician.', skills: 'Advanced research in a niche field.' } },
+                     { id: 'other', name: 'Not Listed / Other', details: { exams: '', careers: 'Get personalized help from our AI assistant.', skills: '' } }
+                ],
+
+            },
+            feedback: [
+                { id: 'excited', name: 'Excited', icon: '😍' },
+                { id: 'hopeful', name: 'Hopeful', icon: '😊' },
+                { id: 'unsure', name: 'Unsure', icon: '🤔' },
+                { id: 'worried', name: 'Worried', icon: '😟' },
+            ],
+            mentors: [
+                { name: 'Dr. Anjali Sharma', expertise: 'Medical & Healthcare', avatar: '👩‍⚕️' },
+                { name: 'Rohan Verma', expertise: 'Software Engineering & AI', avatar: '👨‍💻' },
+                { name: 'Priya Singh', expertise: 'Civil Services (UPSC)', avatar: '👩‍⚖️' },
+                { name: 'Amit Desai', expertise: 'Finance & CA', avatar: '👨‍💼' },
+            ],
+            recommendations: [
+                { path: "Software Development", percentage: 45, context: "among B.Tech students in your city", icon: "💻" },
+                { path: "Data Science & AI", percentage: 30, context: "trending in your age group", icon: "🤖" },
+                { path: "Civil Services", percentage: 15, context: "popular at Delhi University", icon: "🏛️" }
+            ],
+            friends: [
+                { name: 'Aarav Sharma', status: 'Online', avatar: '🧑‍💻' },
+                { name: 'Priya Patel', status: 'Offline', avatar: '👩‍🔬' },
+                { name: 'Rohan Gupta', status: 'Online', avatar: '👨‍🎨' },
+                { name: 'Sneha Reddy', status: 'In a meeting', avatar: '👩‍💼' }
+            ]
+        };
+
+        const userState = {
+            role: 'student',
+            userId: null,
+            details: {},
+            class: null,
+            stream: null,
+            feeling: null,
+            username: 'Guest',
+            userActivity: [],
+            lastEditTimestamp: null,
+            language: 'en-IN',
+            simulationHistory: [],
+            tasks: [], 
+            helpTickets: [], 
+        };
+        
+        // --- GEMINI API CONFIG ---
+        const apiKey = "REPLACE_WITH_YOUR_API_KEY"; // The platform will inject the key here.
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        
+        // --- UI & LOGIC FUNCTIONS ---
+        let currentStep = 'step-welcome';
+        let previousStep = 'step-welcome';
+        let notificationCallback = null;
+        const synth = window.speechSynthesis;
+
+        function addActivity(description, icon, details = {}) {
+            userState.userActivity.push({
+                id: Date.now(),
+                timestamp: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }),
+                description: description,
+                icon: icon,
+                details: details
+            });
+        }
+
+        function showNotification(message, contentHTML = null, callback = null) {
+            const messageP = document.getElementById('notification-message');
+            const contentDiv = document.getElementById('notification-content');
+            
+            // Clear previous custom content
+            const custom = contentDiv.querySelector('#custom-notification-body');
+            if(custom) custom.remove();
+
+            if (contentHTML) {
+                messageP.classList.add('hidden');
+                const customBody = document.createElement('div');
+                customBody.id = 'custom-notification-body';
+                customBody.innerHTML = contentHTML;
+                contentDiv.prepend(customBody);
+            } else {
+                messageP.classList.remove('hidden');
+                messageP.textContent = message;
+            }
+
+            document.getElementById('notification-modal').classList.remove('hidden');
+            notificationCallback = callback;
+        }
+
+
+        function hideNotification() {
+            document.getElementById('notification-modal').classList.add('hidden');
+            if (typeof notificationCallback === 'function') {
+                notificationCallback();
+            }
+            notificationCallback = null;
+        }
+
+        function showStep(stepId) {
+            const currentEl = document.getElementById(currentStep);
+            const nextEl = document.getElementById(stepId);
+            
+            if (synth.speaking) {
+                synth.cancel();
+            }
+
+            if (currentEl) {
+                currentEl.classList.remove('step-visible');
+                currentEl.classList.add('step-hidden');
+            }
+            
+            if(nextEl) {
+                if (stepId === 'step-home') {
+                    document.getElementById('home-username').textContent = userState.username;
+                    if(userState.stream) {
+                        populateLearningHub();
+                    }
+                    populateRecommendations();
+                }
+                if (stepId === 'step-progress-tracker') {
+                    renderTasks();
+                }
+                 if (stepId === 'step-helpdesk') {
+                    renderHelpTickets();
+                }
+                if (stepId === 'step-activation') {
+                    document.getElementById('summary-class').textContent = userState.class?.name || 'N/A';
+                    document.getElementById('summary-stream').textContent = userState.stream?.name || 'N/A';
+                    document.getElementById('summary-feeling').textContent = `${userState.feeling?.icon} ${userState.feeling?.name}` || 'N/A';
+                }
+                if (stepId === 'step-community-hub') populateCommunityRooms();
+                if (stepId === 'step-mentors') populateMentors();
+                if (stepId === 'step-activity-center') populateActivityCenter();
+                if (stepId === 'step-friends') populateFriendsList();
+                
+                setTimeout(() => {
+                    nextEl.classList.remove('step-hidden');
+                    nextEl.classList.add('step-visible');
+                    previousStep = currentStep;
+                    currentStep = stepId;
+                    
+                    const mainContainer = document.querySelector('main');
+                    if(mainContainer) mainContainer.scrollTop = 0;
+                }, 100); 
+            }
+        }
+        
+        function triggerConfetti() {
+            const container = document.getElementById('confetti-container');
+            container.innerHTML = ''; // Clear previous confetti
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti-piece';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.animationDelay = `${Math.random() * 2}s`;
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 90%, 70%)`;
+                container.appendChild(confetti);
+            }
+        }
+
+
+        function showAuthForm(type) {
+            if (type === 'signin') {
+                showStep('step-signin-form');
+            } else {
+                showStep('step-signup-form');
+            }
+        }
+
+        function handleLogin() {
+            const emailInput = document.getElementById('signin-email').value;
+            userState.username = emailInput ? emailInput.split('@')[0] : 'Guest' + Math.floor(Math.random() * 1000);
+            userState.userId = 'CareerFriend-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            triggerConfetti();
+            showStep('step-home');
+        }
+
+        function handleSignup() {
+            // Validation
+            const firstName = document.getElementById('signup-first-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const terms = document.getElementById('terms-agree').checked;
+            
+            if (!firstName || !email || !password) {
+                showNotification("Please fill out all required fields.");
+                return;
+            }
+            if (!terms) {
+                showNotification("You must agree to the Terms & Conditions.");
+                return;
+            }
+            
+            userState.details = {
+                firstName: firstName,
+                lastName: document.getElementById('signup-last-name').value,
+                phone: document.getElementById('signup-phone').value,
+                email: email,
+                country: document.getElementById('signup-country').value
+            };
+            userState.username = firstName;
+            userState.userId = 'CareerFriend-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+
+            addActivity(`Profile Created for ${userState.username}`, '👤');
+            triggerConfetti();
+            showStep('step-home');
+        }
+
+        function handleDetailsSubmit() {
+            // This is now primarily for social logins
+            userState.details.firstName = document.getElementById('first-name').value || userState.details.firstName;
+            userState.details.lastName = document.getElementById('last-name').value;
+            userState.details.phone = document.getElementById('phone').value;
+            userState.details.country = document.getElementById('country').value;
+            userState.details.state = document.getElementById('state').value;
+            userState.details.district = document.getElementById('district').value;
+            
+            if(userState.details.firstName) {
+                userState.username = userState.details.firstName;
+            }
+            addActivity(`Profile Completed for ${userState.username}`, '👤');
+            triggerConfetti();
+            showStep('step-home');
+        }
+        
+        function handleGoogleLogin() {
+            userState.userId = 'CareerFriend-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            userState.username = "SocialUser"; // Placeholder
+            showNotification("Google Login is a demo. Please complete your profile.", null, () => showStep('step-details'));
+        }
+
+        function handleAppleLogin() {
+            userState.userId = 'CareerFriend-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            userState.username = "SocialUser"; // Placeholder
+            showNotification("Apple Login is a demo. Please complete your profile.", null, () => showStep('step-details'));
+        }
+        
+        function handleDevLogin(event) {
+            event.preventDefault();
+            showNotification("The developer access panel is a conceptual feature for this prototype.");
+        }
+
+        function handleFindFriends() {
+            addActivity("Explored 'Your Networks'", '🤝');
+            showStep('step-friends');
+        }
+
+        function handleExpertConnect() {
+            const searchInput = document.getElementById('expert-search-input');
+            const field = searchInput.value.trim();
+            if (!field) {
+                showNotification("Please enter a field to search for an expert.");
+                return;
+            }
+            addActivity(`Searched for an expert in: ${field}`, '🧑‍🏫');
+            showNotification(`Connecting with an expert in "${field}" is a conceptual feature. In a real app, we would connect you with a verified professional.`);
+            searchInput.value = '';
+        }
+        
+        function handleForgotPassword(event, emailFieldId) {
+            event.preventDefault();
+            const email = document.getElementById(emailFieldId).value || "your email";
+            showNotification(`A password reset link has been sent to ${email}. (This is a demo).`);
+        }
+
+        function handleSettingClick(setting) {
+             addActivity(`Accessed setting: ${setting}`, '⚙️');
+            switch(setting) {
+                case 'share':
+                    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${userState.userId}`;
+                    const qrContent = `
+                        <h3 class="text-xl font-bold mb-2">Share Your Profile</h3>
+                        <p class="text-sm text-gray-400 mb-4">Your User ID: ${userState.userId}</p>
+                        <img src="${qrCodeUrl}" alt="Your QR Code" class="mx-auto rounded-lg border-4 border-gray-600">
+                    `;
+                    showNotification(null, qrContent);
+                    break;
+                case 'help':
+                    showStep('step-helpdesk');
+                    break;
+                case 'password':
+                    showNotification("A password reset link has been sent to your email. (This is a demo).");
+                    break;
+                case 'deactivate':
+                    showNotification("Are you sure you want to deactivate your account for 15 days? This action can be undone by logging in again. (This is a demo).");
+                    break;
+                case 'delete':
+                     showNotification("Are you sure you want to permanently delete your account? This action cannot be undone. (This is a demo).");
+                    break;
+            }
+        }
+
+        function handleLogout() {
+            addActivity('User logged out', '👋');
+            // The restart function will handle resetting state and showing the welcome screen.
+            // Adding a notification provides better user feedback.
+            showNotification("You have been successfully logged out.", null, restart);
+        }
+
+        function openEditProfile() {
+            addActivity(`Accessed setting: edit`, '⚙️');
+            const thirtyDaysInMillis = 30 * 24 * 60 * 60 * 1000;
+            const now = Date.now();
+
+            if (userState.lastEditTimestamp && (now - userState.lastEditTimestamp < thirtyDaysInMillis)) {
+                const nextEditDate = new Date(userState.lastEditTimestamp + thirtyDaysInMillis);
+                showNotification(`You can edit your profile again on ${nextEditDate.toLocaleDateString()}.`);
+            } else {
+                // Pre-populate the form
+                document.getElementById('edit-first-name').value = userState.details.firstName || '';
+                document.getElementById('edit-last-name').value = userState.details.lastName || '';
+                document.getElementById('edit-country').value = userState.details.country || '';
+                document.getElementById('edit-state').value = userState.details.state || '';
+                document.getElementById('edit-district').value = userState.details.district || '';
+                showStep('step-edit-profile');
+            }
+        }
+
+        function handleProfileUpdate(event) {
+            event.preventDefault();
+            // Update userState with new details
+            userState.details.firstName = document.getElementById('edit-first-name').value;
+            userState.details.lastName = document.getElementById('edit-last-name').value;
+            userState.details.country = document.getElementById('edit-country').value;
+            userState.details.state = document.getElementById('edit-state').value;
+            userState.details.district = document.getElementById('edit-district').value;
+            
+            // Update username if first name changed
+            if (userState.details.firstName) {
+                userState.username = userState.details.firstName;
+            }
+
+            // Set the timestamp for the 30-day lock
+            userState.lastEditTimestamp = Date.now();
+
+            addActivity('Profile details updated', '✏️');
+            showNotification("Your profile has been updated successfully!");
+            showStep('step-settings');
+        }
+
+
+        function handleClassSelect(classId) {
+            userState.class = careerData.classes.find(c => c.id === classId);
+            addActivity(`Selected academic stage: ${userState.class.name}`, '🎓');
+            populateStreams(classId);
+            showStep('step-stream');
+        }
+        
+        function handleStreamSelect(streamId, classId) {
+            userState.stream = careerData.streams[classId].find(s => s.id === streamId);
+            addActivity(`Chose career path: ${userState.stream.name}`, '🛤️');
+            showStep('step-feedback');
+        }
+
+        function handleFeedbackSelect(feedbackId) {
+            userState.feeling = careerData.feedback.find(f => f.id === feedbackId);
+            showStep('step-interest');
+        }
+
+        function handleOtherStreamSelect() {
+            addActivity("Selected 'Not Listed' path", '❓');
+            openChat();
+            const messagesContainer = document.getElementById('chat-messages');
+            
+            // Clear previous messages but keep the initial AI welcome.
+            messagesContainer.innerHTML = `<div class="p-3 rounded-lg bg-indigo-600 text-white self-start max-w-xs break-words">Hi! I'm Career Friend, your AI career assistant.</div>`;
+            
+            // Add the new custom apology message
+            const aiMessageDiv = document.createElement('div');
+            aiMessageDiv.className = 'p-3 rounded-lg bg-indigo-600 text-white self-start max-w-xs break-words';
+            aiMessageDiv.innerHTML = "I sincerely apologize that your specific career path wasn't on our list. I'm an expert at this, and I am here to help you explore it! <br><br>Could you please tell me more about the field you're interested in? I'll do my best to provide the information and guidance you need.";
+            messagesContainer.appendChild(aiMessageDiv);
+
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function restart() {
+            Object.assign(userState, {
+                details: {},
+                class: null,
+                stream: null,
+                feeling: null,
+                username: 'Guest',
+                userId: null,
+                userActivity: [],
+                lastEditTimestamp: null,
+                tasks: [],
+                helpTickets: [],
+            });
+            localStorage.removeItem('career-friend-tasks');
+            localStorage.removeItem('career-friend-help-tickets');
+            document.getElementById('learning-hub-container').classList.add('hidden');
+            // Reset forms
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => form.reset());
+            document.getElementById('interests').value = '';
+            document.getElementById('inspiration').value = '';
+
+            document.getElementById('interview-questions-container').innerHTML = '';
+            document.getElementById('interview-questions-container').classList.add('hidden');
+            document.getElementById('interview-btn').disabled = false;
+            document.getElementById('chat-messages').innerHTML = `<div class="p-3 rounded-lg bg-indigo-600 text-white self-start max-w-xs break-words">Hi! I'm Career Friend, your AI career assistant. How can I help you today?</div>`;
+            showStep('step-welcome');
+        }
+        
+        // --- DYNAMIC CONTENT POPULATION ---
+        function populateClasses() {
+            const container = document.getElementById('class-options');
+            container.innerHTML = careerData.classes.map(cls => `
+                <button onclick="handleClassSelect('${cls.id}')" class="choice-card bg-gray-700/50 border border-gray-600 rounded-lg p-6 text-center group hover:border-indigo-500">
+                    <div class="text-4xl mb-3">${cls.icon}</div>
+                    <h3 class="font-semibold text-base text-gray-200 group-hover:text-indigo-400">${cls.name}</h3>
+                </button>
+            `).join('');
+        }
+
+        function populateStreams(classId) {
+            const container = document.getElementById('stream-options');
+            const streams = careerData.streams[classId] || careerData.streams['12th']; 
+            container.innerHTML = streams.map(stream => {
+                const onclickAction = stream.id === 'other'
+                    ? `handleOtherStreamSelect()`
+                    : `handleStreamSelect('${stream.id}', '${classId}')`;
+                
+                return `
+                    <button onclick="${onclickAction}" class="choice-card bg-gray-700/50 border border-gray-600 rounded-lg p-5 text-left group hover:border-indigo-500">
+                        <h3 class="font-semibold text-base text-gray-200 group-hover:text-indigo-400">${stream.name}</h3>
+                        <p class="text-sm text-gray-400 mt-1">${stream.details.careers.substring(0, 50)}...</p>
+                    </button>
+                `;
+            }).join('');
+        }
+        
+        function populateFeedback() {
+            const container = document.getElementById('feedback-options');
+            container.innerHTML = careerData.feedback.map(fb => `
+                <button onclick="handleFeedbackSelect('${fb.id}')" class="choice-card text-center group">
+                    <div class="text-5xl sm:text-6xl md:text-7xl p-3 sm:p-4 bg-gray-700/50 rounded-full group-hover:scale-110 transition-transform">${fb.icon}</div>
+                    <span class="mt-4 font-medium text-gray-300 group-hover:text-indigo-400">${fb.name}</span>
+                </button>
+            `).join('');
+        }
+
+        function populateRecommendations() {
+            const container = document.getElementById('recommendations-container');
+            container.innerHTML = careerData.recommendations.map(rec => `
+                <div class="bg-gray-700/50 border border-gray-600 rounded-lg p-4">
+                    <div class="flex items-center gap-3">
+                        <div class="text-2xl">${rec.icon}</div>
+                        <div>
+                            <h4 class="font-bold text-white">${rec.path}</h4>
+                            <p class="text-xs text-indigo-300">${rec.percentage}% of students</p>
+                            <p class="text-xs text-gray-400 mt-1">${rec.context}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function populateActivityCenter() {
+            document.getElementById('activity-center-username').textContent = userState.username;
+            const feed = document.getElementById('activity-center-feed');
+            
+            const fortyFiveDaysInMillis = 45 * 24 * 60 * 60 * 1000;
+            const cutoffDate = Date.now() - fortyFiveDaysInMillis;
+            
+            const recentActivities = userState.userActivity.filter(activity => activity.id > cutoffDate);
+
+            if (recentActivities.length === 0) {
+                feed.innerHTML = `<p class="text-gray-500 text-center">No recent activities logged. Activities older than 45 days are automatically cleared.</p>`;
+                return;
+            }
+            
+            feed.innerHTML = recentActivities.slice().reverse().map(activity => `
+                <div class="flex items-start gap-4 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
+                    <div class="text-xl bg-gray-700 p-2 rounded-md">${activity.icon}</div>
+                    <div>
+                        <p class="font-semibold text-gray-200">${activity.description}</p>
+                        <p class="text-xs text-gray-500">${activity.timestamp}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add a footer note
+            const footerNote = document.createElement('p');
+            footerNote.className = "text-xs text-gray-500 text-center mt-4 italic";
+            footerNote.textContent = "Activities are automatically cleared after 45 days.";
+            feed.appendChild(footerNote);
+        }
+        
+        function populateFriendsList() {
+            const container = document.getElementById('friends-list');
+            container.innerHTML = careerData.friends.map(friend => `
+                <div class="bg-gray-700/50 p-4 rounded-lg flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="text-4xl">${friend.avatar}</div>
+                        <div>
+                            <p class="font-bold">${friend.name}</p>
+                            <p class="text-sm ${friend.status === 'Online' ? 'text-green-400' : 'text-gray-500'}">${friend.status}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="showNotification('Live chat feature is coming soon!')" class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg">Chat</button>
+                        <button onclick="showNotification('Video call feature is coming soon!')" class="text-sm bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg">Call</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- PROGRESS TRACKER FUNCTIONS ---
+        function loadTasks() {
+            const savedTasks = localStorage.getItem('career-friend-tasks');
+            if (savedTasks) {
+                userState.tasks = JSON.parse(savedTasks);
+            }
+            renderTasks();
+        }
+
+        function saveTasks() {
+            localStorage.setItem('career-friend-tasks', JSON.stringify(userState.tasks));
+        }
+
+        function addTask() {
+            const taskInput = document.getElementById('new-task-input');
+            const dateInput = document.getElementById('new-task-date');
+            const taskText = taskInput.value.trim();
+            const dueDate = dateInput.value;
+
+            if (!taskText) {
+                showNotification("Please enter a task description.");
+                return;
+            }
+
+            const newTask = {
+                id: Date.now(),
+                text: taskText,
+                dueDate: dueDate,
+                completed: false
+            };
+
+            userState.tasks.push(newTask);
+            addActivity(`Added new task: "${taskText}"`, '🎯');
+            saveTasks();
+            renderTasks();
+
+            taskInput.value = '';
+            dateInput.value = '';
+        }
+        
+        function toggleTask(taskId) {
+            const task = userState.tasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = !task.completed;
+                if(task.completed) {
+                     addActivity(`Completed task: "${task.text}"`, '✅');
+                }
+                saveTasks();
+                renderTasks();
+            }
+        }
+        
+        function deleteTask(taskId) {
+            const task = userState.tasks.find(t => t.id === taskId);
+             if (task) {
+                addActivity(`Deleted task: "${task.text}"`, '🗑️');
+             }
+            userState.tasks = userState.tasks.filter(t => t.id !== taskId);
+            saveTasks();
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const taskListContainer = document.getElementById('task-list');
+            if (!taskListContainer) return;
+
+            // Sort tasks: incomplete first, then by due date.
+            const sortedTasks = [...userState.tasks].sort((a, b) => {
+                if (a.completed !== b.completed) return a.completed - b.completed;
+                if (a.dueDate && b.dueDate) return new Date(a.dueDate) - new Date(b.dueDate);
+                return a.dueDate ? -1 : 1;
+            });
+            
+            if(sortedTasks.length === 0) {
+                taskListContainer.innerHTML = `<p class="text-center text-gray-500">No tasks yet. Add your first goal!</p>`;
+                return;
+            }
+
+            taskListContainer.innerHTML = sortedTasks.map(task => {
+                const isCompleted = task.completed;
+                const dueDate = task.dueDate ? new Date(task.dueDate + 'T00:00:00') : null;
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                const isOverdue = dueDate && dueDate < today && !isCompleted;
+
+                return `
+                    <div class="task-item bg-gray-700/50 p-3 rounded-lg flex items-center justify-between gap-4 ${isCompleted ? 'completed' : ''}">
+                        <div class="flex items-center gap-3 flex-grow">
+                             <input type="checkbox" onchange="toggleTask(${task.id})" ${isCompleted ? 'checked' : ''} class="w-5 h-5 bg-gray-700 border border-gray-600 rounded text-indigo-500 focus:ring-indigo-500 flex-shrink-0">
+                            <div class="flex-grow">
+                                <p class="text-gray-200">${task.text}</p>
+                                ${task.dueDate ? `<p class="text-xs ${isOverdue ? 'text-red-400 font-semibold' : 'text-gray-400'}">Due: ${new Date(task.dueDate + 'T00:00:00').toLocaleDateString()}</p>` : ''}
+                            </div>
+                        </div>
+                        <button onclick="deleteTask(${task.id})" class="text-gray-500 hover:text-red-400 transition-colors p-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function checkDeadlines() {
+            const today = new Date().toISOString().split('T')[0];
+            const dueTodayTasks = userState.tasks.filter(task => task.dueDate === today && !task.completed);
+            
+            if (dueTodayTasks.length > 0) {
+                const taskNames = dueTodayTasks.map(t => t.text).join(', ');
+                setTimeout(() => { // Delay notification slightly to not interrupt user instantly
+                    showNotification(`Reminder: You have ${dueTodayTasks.length} task(s) due today: ${taskNames}`);
+                }, 1500);
+            }
+        }
+
+        // --- HELPDESK FUNCTIONS ---
+        function loadHelpTickets() {
+            const savedTickets = localStorage.getItem('career-friend-help-tickets');
+            if (savedTickets) {
+                userState.helpTickets = JSON.parse(savedTickets);
+            }
+        }
+
+        function saveHelpTickets() {
+            localStorage.setItem('career-friend-help-tickets', JSON.stringify(userState.helpTickets));
+        }
+
+        function handleHelpdeskSubmit(event) {
+            event.preventDefault();
+            const topicSelect = document.getElementById('help-topic');
+            const messageTextarea = document.getElementById('help-message');
+
+            const topic = topicSelect.value;
+            const message = messageTextarea.value.trim();
+
+            if (!message) {
+                showNotification("Please describe your issue before submitting.");
+                return;
+            }
+
+            const newTicket = {
+                id: Date.now(),
+                topic: topic,
+                message: message,
+                status: 'Submitted',
+                timestamp: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+            };
+
+            userState.helpTickets.unshift(newTicket); // Add to the beginning of the array
+            addActivity(`Submitted a help ticket on: "${topic}"`, '🎟️');
+            saveHelpTickets();
+            renderHelpTickets();
+            
+            // Reset form
+            messageTextarea.value = '';
+            
+            showNotification("Your ticket has been submitted successfully. Our team will review it and get back to you within 24-48 hours.");
+        }
+
+        function renderHelpTickets() {
+            const historyContainer = document.getElementById('ticket-history-list');
+            if (!historyContainer) return;
+
+            if (userState.helpTickets.length === 0) {
+                historyContainer.innerHTML = `<p class="text-center text-gray-500">You have not submitted any tickets.</p>`;
+                return;
+            }
+
+            const statusColors = {
+                'Submitted': 'bg-blue-500/20 text-blue-300',
+                'In Progress': 'bg-yellow-500/20 text-yellow-300',
+                'Resolved': 'bg-green-500/20 text-green-300',
+            };
+
+            historyContainer.innerHTML = userState.helpTickets.map(ticket => `
+                <div class="bg-gray-700/50 p-4 rounded-lg border border-gray-600">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="font-bold text-gray-200">${ticket.topic}</p>
+                            <p class="text-xs text-gray-500 mt-1">${ticket.timestamp}</p>
+                        </div>
+                        <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusColors[ticket.status] || 'bg-gray-500/20 text-gray-300'}">${ticket.status}</span>
+                    </div>
+                    <p class="text-sm text-gray-300 mt-3 whitespace-pre-wrap">${ticket.message.substring(0, 150)}${ticket.message.length > 150 ? '...' : ''}</p>
+                </div>
+            `).join('');
+        }
+
+        // --- GEMINI API FUNCTIONS ---
+
+        async function callGeminiAPI(prompt, systemInstruction, useSearch = false) {
+             const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                }
+            };
+            
+            if (useSearch) {
+                payload.tools = [{ "google_search": {} }];
+            }
+            const fullApiUrl = `${apiUrl.split('?key=')[0]}?key=${apiKey}`;
+
+            try {
+                let response;
+                let retries = 3;
+                let delay = 1000;
+                while(retries > 0) {
+                    response = await fetch(fullApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) break;
+                    retries--;
+                    if(retries > 0) await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+
+                if (!response.ok) {
+                    console.error("API Error Response:", await response.text());
+                    throw new Error(`API call failed with status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) throw new Error("No text found in API response.");
+                return JSON.parse(text);
+            } catch (error) {
+                console.error("Gemini API call error:", error);
+                return null;
+            }
+        }
+
+        function formatGeminiResponse(text) {
+             return text
+                .replace(/\*\*(.*?)\*\*/g, '<h4 class="font-bold text-base text-white mt-4 mb-2">$1</h4>')
+                .replace(/\*/g, '<br>') // Replace single asterisks with line breaks for lists
+                .replace(/\n/g, '<br>');
+        }
+
+        async function generateAndShowFinalStep() {
+            showStep('step-final');
+            const finalDetailsContainer = document.getElementById('final-details');
+            document.getElementById('final-path-title').textContent = userState.stream.name;
+            finalDetailsContainer.innerHTML = '<div class="flex justify-center items-center h-full p-10"><div class="loader"></div></div>';
+            
+            addActivity(`Activated path & generated AI insights for ${userState.stream.name}`, '✨');
+
+            // Make the API calls run in parallel for a faster experience
+            Promise.all([
+                generateSummaryContent(finalDetailsContainer),
+                generateAndRenderCareerTree(),
+                generateStepByStepGuide(),
+                generateCoachingRecommendations()
+            ]);
+        }
+
+        async function generateSummaryContent(container) {
+            const interests = document.getElementById('interests').value || 'Not specified';
+            const inspiration = document.getElementById('inspiration').value || 'Not specified';
+            
+            let languageInstruction = '';
+            if (userState.language === 'hi') { languageInstruction = " IMPORTANT: Your entire response must be in Hindi, using Devanagari script.";
+            } else if (userState.language === 'hi-en') { languageInstruction = " IMPORTANT: Your entire response must be in Hinglish (a mix of Hindi and English, written in Latin script)."; }
+
+            const systemInstruction = "You are an expert, friendly, and encouraging career counselor named 'Career Friend'. Your goal is to provide personalized, insightful, and motivational advice. Format your response as a single JSON object. The keys should be strings like 'summary', 'milestones', 'careers', 'skills', 'futureProofing', and 'motivation'." + languageInstruction;
+
+            const prompt = `
+                Generate a personalized career path summary for a student with the following details. Return the response as a single JSON object.
+                - Academic Stage: ${userState.class.name}
+                - Path: ${userState.stream.name}
+                - Feeling: ${userState.feeling.name}
+                - Interests: ${interests}
+                - Inspiration: ${inspiration}
+                
+                The JSON object should have these keys:
+                - "summary": (string) An encouraging overview.
+                - "milestones": (string) Important next steps using this info: ${userState.stream.details.exams}.
+                - "careers": (string) Exciting job roles using this info: ${userState.stream.details.careers}.
+                - "skills": (string) Key skills to develop using this info: ${userState.stream.details.skills}.
+                - "futureProofing": (string) Provide 2-3 concise, actionable points on how to stay ahead in the evolving job market for this specific field. Focus on continuous learning (e.g., specific online courses or certifications), networking strategies, and crucial soft skills. THIS SECTION MUST BE DISTINCT AND ACTIONABLE.
+                - "motivation": (string) A concluding motivational paragraph.
+            `;
+
+            const responseJson = await callGeminiAPI(prompt, systemInstruction);
+            
+            if (!responseJson) {
+                 container.innerHTML = `<div class="text-center text-red-400 p-4">An error occurred while contacting the AI for your summary. Please check your network connection and try again.</div>`;
+            } else {
+                let formattedHtml = `
+                    <h4 class="font-bold text-base text-white mt-4 mb-2">Your Personalized Summary</h4>
+                    <p>${responseJson.summary || ''}</p>
+                    <h4 class="font-bold text-base text-white mt-4 mb-2">Key Milestones & Exams</h4>
+                    <p>${responseJson.milestones || ''}</p>
+                    <h4 class="font-bold text-base text-white mt-4 mb-2">Potential Careers on this Path</h4>
+                    <p>${responseJson.careers || ''}</p>
+                    <h4 class="font-bold text-base text-white mt-4 mb-2">Skills to Cultivate</h4>
+                    <p>${responseJson.skills || ''}</p>
+                     <h4 class="font-bold text-base text-white mt-4 mb-2">Future-Proofing Your Career</h4>
+                    <p>${responseJson.futureProofing || ''}</p>
+                    <br>
+                    <p>${responseJson.motivation || ''}</p>
+                `;
+                container.innerHTML = formattedHtml;
+            }
+        }
+        
+        async function generateStepByStepGuide() {
+            const guideSection = document.getElementById('step-by-step-guide-section');
+            const guideContent = document.getElementById('step-by-step-guide-content');
+            guideContent.innerHTML = '<div class="flex justify-center items-center p-10"><div class="loader"></div></div>';
+            guideSection.classList.remove('hidden');
+
+            let languageInstruction = userState.language === 'hi' ? " IMPORTANT: Your entire response must be in Hindi, using Devanagari script." : "";
+            
+            const systemInstruction = "You are an AI career guide. Generate a detailed, step-by-step guide for a student's chosen career path. The response must be a single JSON object with a key 'guide', which is an array of objects. Each object must have three keys: 'step' (e.g., 'Step 1: Foundational Learning'), 'description' (a detailed paragraph explaining the step), and 'jobRoles' (an array of 2-3 job roles this step prepares for)." + languageInstruction;
+            const prompt = `Generate a step-by-step guide for the career path: ${userState.stream.name}.`;
+
+            const responseJson = await callGeminiAPI(prompt, systemInstruction);
+            
+            if (!responseJson || !responseJson.guide) {
+                 guideContent.innerHTML = `<p class="text-center text-gray-400">Could not generate the step-by-step guide at this time.</p>`;
+                 return;
+            }
+
+            let html = '<dl class="space-y-4">';
+            responseJson.guide.forEach(item => {
+                html += `
+                    <div class="p-4 bg-gray-700/50 rounded-lg">
+                        <dt class="font-bold text-lg text-indigo-300">${item.step}</dt>
+                        <dd class="mt-2 text-gray-300">${item.description}</dd>
+                        <dd class="mt-3 text-sm"><strong>Prepares for roles like:</strong> ${item.jobRoles.join(', ')}</dd>
+                    </div>
+                `;
+            });
+            html += '</dl>';
+            guideContent.innerHTML = html;
+        }
+
+        async function generateAndRenderCareerTree() {
+            const treeContainer = document.getElementById('career-tree-container');
+            const treeSection = document.getElementById('career-path-tree-section');
+            treeContainer.innerHTML = '<div class="flex justify-center items-center p-10"><div class="loader"></div></div>';
+            treeSection.classList.remove('hidden');
+
+            const systemInstruction = `You are an AI that creates career roadmaps. Based on a career path, generate a simplified tree structure of the journey. The response must be a single JSON object. The root object must be named "root" and should have a "title" and a "children" array. Each child object in the array represents a stage and must have "title" (the stage name), "outcomes" (an array of 2-3 key achievements for that stage), and "jobs" (an array of 2-3 sample job titles unlocked by that stage). Keep all text concise.`;
+
+            const prompt = `Generate a career roadmap tree for the path: ${userState.stream.name}.`;
+
+            const treeData = await callGeminiAPI(prompt, systemInstruction);
+
+            if (!treeData || !treeData.root) {
+                treeContainer.innerHTML = `<p class="text-center text-gray-400">Could not generate the career roadmap at this time.</p>`;
+            } else {
+                renderCareerTree(treeData.root, treeContainer);
+            }
+        }
+
+        function renderCareerTree(rootNode, container) {
+            function createNodeHTML(node) {
+                let outcomesHTML = (node.outcomes && Array.isArray(node.outcomes)) ? node.outcomes.map(o => `<li>${o}</li>`).join('') : '';
+                let jobsHTML = (node.jobs && Array.isArray(node.jobs)) ? node.jobs.map(j => `<li>${j}</li>`).join('') : '';
+                return `
+                    <div class="tree-node">
+                        <div class="title">${node.title}</div>
+                        ${outcomesHTML ? `<div class="outcomes"><strong>Outcomes:</strong><ul>${outcomesHTML}</ul></div>` : ''}
+                        ${jobsHTML ? `<div class="jobs"><strong>Jobs:</strong><ul>${jobsHTML}</ul></div>` : ''}
+                    </div>
+                `;
+            }
+
+            function createTreeHTML(node) {
+                let childrenHTML = '';
+                if (node.children && node.children.length > 0) {
+                    childrenHTML = '<ul>';
+                    node.children.forEach(child => {
+                        childrenHTML += createTreeHTML(child);
+                    });
+                    childrenHTML += '</ul>';
+                }
+                return `<li>${createNodeHTML(node)}${childrenHTML}</li>`;
+            }
+
+            const treeHTML = `<div class="tree"><ul>${createTreeHTML(rootNode)}</ul></div>`;
+            container.innerHTML = treeHTML;
+        }
+
+        function downloadCareerTree() {
+            const treeElement = document.getElementById('career-tree-container');
+            if (!treeElement) return;
+
+            addActivity('Downloaded Career Roadmap', '📥');
+            
+            html2canvas(treeElement, { 
+                backgroundColor: document.body.classList.contains('light-theme') ? '#f3f4f6' : '#1f2937',
+                scale: 2 
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'cusees-career-roadmap.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+        
+        async function generateCoachingRecommendations() {
+            const section = document.getElementById('coaching-section');
+            const content = document.getElementById('coaching-content');
+            section.classList.remove('hidden');
+            content.innerHTML = '<div class="flex justify-center items-center p-10"><div class="loader"></div></div>';
+            
+            let languageInstruction = userState.language === 'hi' ? " IMPORTANT: Your entire response must be in Hindi, using Devanagari script." : "";
+            
+            const systemInstruction = "You are an AI assistant that finds top coaching institutes. Based on a career path, use Google Search to find 2-3 real, well-known online coaching platforms and 2-3 real, reputable offline institutes in India. Your response must be a single JSON object with two keys: 'online' and 'offline'. Each key should hold an array of objects. Each object must have 'name' and 'description' keys." + languageInstruction;
+            const prompt = `Find top online and offline coaching institutes in India for a student preparing for ${userState.stream.name}.`;
+
+            const responseJson = await callGeminiAPI(prompt, systemInstruction, true);
+
+            if (!responseJson || (!responseJson.online && !responseJson.offline)) {
+                content.innerHTML = `<p class="text-center text-gray-400">Could not find coaching recommendations at this time.</p>`;
+                return;
+            }
+
+            let html = '';
+            if (responseJson.online && responseJson.online.length > 0) {
+                html += '<div><h4 class="font-bold text-lg text-indigo-300 mb-3">Online Platforms</h4><div class="space-y-3">';
+                responseJson.online.forEach(item => {
+                    html += `<div class="bg-gray-700/50 p-4 rounded-lg"><p class="font-semibold">${item.name}</p><p class="text-sm text-gray-400">${item.description}</p></div>`;
+                });
+                html += '</div></div>';
+            }
+             if (responseJson.offline && responseJson.offline.length > 0) {
+                html += '<div class="mt-6"><h4 class="font-bold text-lg text-indigo-300 mb-3">Offline Institutes</h4><div class="space-y-3">';
+                responseJson.offline.forEach(item => {
+                    html += `<div class="bg-gray-700/50 p-4 rounded-lg"><p class="font-semibold">${item.name}</p><p class="text-sm text-gray-400">${item.description}</p></div>`;
+                });
+                html += '</div></div>';
+            }
+            content.innerHTML = html;
+        }
+
+
+        async function populateLearningHub() {
+            const container = document.getElementById('learning-hub-container');
+            const contentDiv = document.getElementById('learning-hub-content');
+            container.classList.remove('hidden');
+            contentDiv.innerHTML = '<div class="flex justify-center items-center p-10"><div class="loader"></div></div>';
+            
+            let languageInstruction = userState.language === 'hi' ? " IMPORTANT: Your entire response must be in Hindi, using Devanagari script." : "";
+            
+            const systemInstruction = `You are an AI assistant that finds the best free learning resources for students. For a given career path, you must provide a curated list of resources. Your response must be a single JSON object. The JSON should have two keys: "websites" and "youtube". Each key should hold an array of objects. Each object in the "websites" array must have "title", "url", and "description". Each object in the "youtube" array must have "channelName", "description", and "videoId". The videoId must be a valid YouTube video ID for a highly relevant beginner's guide or popular video from that channel.` + languageInstruction;
+
+            const prompt = `Find learning resources for the career path: ${userState.stream.name}`;
+            
+            const resources = await callGeminiAPI(prompt, systemInstruction);
+
+            if (!resources || !resources.websites || !resources.youtube) {
+                contentDiv.innerHTML = `<p class="text-center text-gray-400">Could not load resources at this time. Please try again later.</p>`;
+                return;
+            }
+
+            let html = '<div><h4 class="font-bold text-lg text-indigo-300 mb-3">Top Websites & Courses</h4><div class="space-y-3">';
+            resources.websites.forEach(site => {
+                html += `
+                    <div class="bg-gray-700/50 p-4 rounded-lg">
+                        <a href="${site.url}" target="_blank" class="font-semibold hover:underline">${site.title}</a>
+                        <p class="text-sm text-gray-400">${site.description}</p>
+                    </div>
+                `;
+            });
+            html += '</div></div>';
+
+            html += '<div class="mt-6"><h4 class="font-bold text-lg text-indigo-300 mb-3">Recommended YouTube Videos</h4><div class="space-y-3">';
+            resources.youtube.forEach(video => {
+                html += `
+                    <div class="bg-gray-700/50 p-4 rounded-lg">
+                        <p class="font-semibold">${video.channelName}</p>
+                        <p class="text-sm text-gray-400 mb-3">${video.description}</p>
+                        <div class="flex gap-2">
+                             <a href="https://www.youtube.com/watch?v=${video.videoId}" target="_blank" class="text-sm bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded-md">Open on YouTube</a>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div></div>';
+            
+            contentDiv.innerHTML = html;
+        }
+
+
+        async function generateInterviewQuestions() {
+            const container = document.getElementById('interview-questions-container');
+            const button = document.getElementById('interview-btn');
+            container.classList.remove('hidden');
+            container.innerHTML = '<div class="flex justify-center items-center p-6"><div class="loader"></div></div>';
+            button.disabled = true;
+            
+            const careerField = userState.stream.details.careers.split(',')[0]; 
+            addActivity(`Generated mock interview questions for ${careerField}`, '📝');
+
+            let languageInstruction = userState.language === 'hi' ? " IMPORTANT: Your entire response must be in Hindi, using Devanagari script." : "";
+            const systemInstruction = "You are a helpful assistant. Generate 5 common but insightful interview questions for a student aspiring to a specific career. Your response must be a single JSON object with a key 'questions', which is an array of objects. Each object must have two keys: 'question' (the interview question) and 'assesses' (what the interviewer is trying to assess)." + languageInstruction;
+            const prompt = `Generate interview questions for a student aspiring to become a ${careerField}.`;
+
+            const responseJson = await callGeminiAPI(prompt, systemInstruction);
+
+            if (!responseJson || !responseJson.questions) {
+                container.innerHTML = `<div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700 text-red-400">Could not generate questions at this time.</div>`;
+                return;
+            }
+            
+            let html = '<div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700 space-y-4">';
+            responseJson.questions.forEach(q => {
+                html += `
+                    <div>
+                        <p class="font-semibold">${q.question}</p>
+                        <p class="text-sm text-gray-400 italic">Assesses: ${q.assesses}</p>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            container.innerHTML = html;
+        }
+        
+        // --- CHATBOT FUNCTIONS ---
+        function openChat() {
+            const chatModal = document.getElementById('chat-modal');
+            chatModal.style.display = 'flex';
+            setTimeout(() => {
+                chatModal.classList.remove('translate-y-10', 'opacity-0');
+            }, 10);
+        }
+
+        function closeChat() {
+            const chatModal = document.getElementById('chat-modal');
+            chatModal.classList.add('translate-y-10', 'opacity-0');
+            setTimeout(() => {
+                chatModal.style.display = 'none';
+            }, 300);
+        }
+
+        async function sendChatMessage(event) {
+            event.preventDefault();
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const messagesContainer = document.getElementById('chat-messages');
+            
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.className = 'p-3 rounded-lg bg-gray-600 text-white self-end max-w-xs ml-auto break-words';
+            userMessageDiv.textContent = message;
+            messagesContainer.appendChild(userMessageDiv);
+            
+            input.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            document.getElementById('chat-loader').classList.remove('hidden');
+
+            let languageInstruction = '';
+            if (userState.language === 'hi') { languageInstruction = " IMPORTANT: Your entire response must be in Hindi, using Devanagari script.";
+            } else if (userState.language === 'hi-en') { languageInstruction = " IMPORTANT: Your entire response must be in Hinglish (a mix of Hindi and English, written in Latin script)."; }
+
+            const systemInstruction = `You are Career Friend, a friendly, concise, and helpful AI career assistant for students. A student is asking you questions. Your response must be a single JSON object with one key: "reply". The value should be your text response. Keep responses brief and to the point. Vary your responses and avoid repeating the same phrases or information across conversations.
+            Current user context (if available):
+            - Academic Stage: ${userState.class?.name || 'Not selected'}
+            - Career Path: ${userState.stream?.name || 'Not selected'}` + languageInstruction;
+            
+            const responseJson = await callGeminiAPI(message, systemInstruction);
+
+            document.getElementById('chat-loader').classList.add('hidden');
+            
+            const aiMessageDiv = document.createElement('div');
+            aiMessageDiv.className = 'p-3 rounded-lg bg-indigo-600 text-white self-start max-w-xs break-words';
+            aiMessageDiv.innerHTML = responseJson ? formatGeminiResponse(responseJson.reply) : "Sorry, I'm having trouble connecting right now.";
+            messagesContainer.appendChild(aiMessageDiv);
+
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // --- BROWSER TTS FUNCTION ---
+        function readSummaryWithBrowser() {
+            const textToRead = document.getElementById('final-details').innerText;
+            if (!textToRead || textToRead.includes("An error occurred")) {
+                 showNotification("Summary not available to read.");
+                return;
+            }
+
+            if (synth.speaking) {
+                synth.cancel(); // Stop speaking if already speaking
+            } else {
+                const utterance = new SpeechSynthesisUtterance(textToRead);
+                utterance.lang = userState.language === 'hi' ? 'hi-IN' : 'en-IN'; // Use en-IN for Hinglish
+                synth.speak(utterance);
+            }
+        }
+
+
+        // --- FEEDBACK FUNCTIONS ---
+        let currentFeedbackContext = {};
+        
+        function showFeedbackModal(context) {
+            currentFeedbackContext = context; // e.g., {type: 'mentor', name: 'Dr. Anjali'}
+            const starsContainer = document.getElementById('feedback-stars-container');
+            starsContainer.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                starsContainer.innerHTML += `<svg onclick="rateExperience(${i})" id="star-${i}" class="w-10 h-10 text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
+            }
+            document.getElementById('feedback-modal').classList.remove('hidden');
+        }
+
+        function hideFeedbackModal() {
+             document.getElementById('feedback-modal').classList.add('hidden');
+        }
+        
+        function rateExperience(rating) {
+            for (let i = 1; i <= 5; i++) {
+                const star = document.getElementById(`star-${i}`);
+                if (i <= rating) {
+                    star.classList.remove('text-gray-500');
+                    star.classList.add('text-yellow-400');
+                } else {
+                    star.classList.remove('text-yellow-400');
+                    star.classList.add('text-gray-500');
+                }
+            }
+            currentFeedbackContext.rating = rating;
+        }
+        
+        function submitFeedback() {
+            const comments = document.getElementById('feedback-text').value;
+            currentFeedbackContext.comments = comments;
+            addActivity(`Submitted feedback`, '⭐', currentFeedbackContext);
+            hideFeedbackModal();
+            showNotification("Thank you for your feedback!");
+        }
+        
+        // --- Video Player Functions ---
+        function playVideoInApp(videoId) {
+            const player = document.getElementById('youtube-player');
+            player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            document.getElementById('video-modal').classList.remove('hidden');
+        }
+
+        function closeVideoPlayer() {
+            const player = document.getElementById('youtube-player');
+            player.src = ''; // Stop the video
+            document.getElementById('video-modal').classList.add('hidden');
+        }
+
+
+        // --- COMMUNITY & MENTOR FUNCTIONS ---
+        function populateCommunityRooms() {
+            const container = document.getElementById('community-rooms');
+            let roomsHtml = '';
+            const roomSet = new Set();
+            Object.values(careerData.streams).flat().forEach(stream => roomSet.add(stream.name));
+            
+            roomSet.forEach(roomName => {
+                roomsHtml += `
+                    <button onclick="joinChatRoom('${roomName}')" class="choice-card bg-gray-700/50 border border-gray-600 rounded-lg p-5 text-left group hover:border-indigo-500">
+                        <h3 class="font-semibold text-base text-gray-200 group-hover:text-indigo-400"># ${roomName}</h3>
+                        <p class="text-sm text-gray-400 mt-1">General discussion for ${roomName}.</p>
+                    </button>
+                `;
+            });
+            container.innerHTML = roomsHtml;
+        }
+
+        async function joinChatRoom(roomName) {
+            showStep('step-chat-room');
+            document.getElementById('chat-room-title').textContent = `# ${roomName}`;
+            const messagesContainer = document.getElementById('chat-room-messages');
+            messagesContainer.innerHTML = '<div class="flex justify-center items-center h-full"><div class="loader"></div></div>';
+            
+            const systemInstruction = "You are Career Friend, an AI community manager. Generate a friendly, one-sentence welcome message for a student joining a specific career chat room. Your response must be a single JSON object with one key: 'welcomeMessage'. Be encouraging and prompt discussion.";
+            const prompt = `Generate a welcome message for the "${roomName}" chat room.`;
+            
+            const responseJson = await callGeminiAPI(prompt, systemInstruction);
+            
+            messagesContainer.innerHTML = `
+                <div class="text-center text-sm text-gray-500 p-2">${responseJson ? responseJson.welcomeMessage : 'Welcome to the chat!'}</div>
+            `;
+        }
+
+        function sendCommunityMessage(event) {
+            event.preventDefault();
+            const input = document.getElementById('chat-room-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const isAnonymous = document.getElementById('anonymous-toggle').checked;
+            const author = isAnonymous ? 'Anonymous Panda' : userState.username;
+            const authorColor = isAnonymous ? 'text-green-400' : 'text-cyan-400';
+            const roomName = document.getElementById('chat-room-title').textContent;
+
+            addActivity(`Posted in ${roomName}`, '💬', { message: message });
+            
+            if (userState.role === 'mentor' || userState.role === 'both') {
+                setTimeout(() => showNotification("✨ You've earned 10 Career Friend Points for helping the community!"), 1000);
+            }
+
+            const messagesContainer = document.getElementById('chat-room-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'p-3 rounded-lg bg-gray-700/70 shadow-sm max-w-lg break-words border border-gray-600';
+            messageDiv.innerHTML = `
+                <p class="font-bold text-sm ${authorColor}">${author}</p>
+                <p class="text-gray-200 mt-1">${message}</p>
+            `;
+            messagesContainer.appendChild(messageDiv);
+            
+            input.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function leaveChatRoom() {
+            showStep('step-community-hub');
+            setTimeout(() => showFeedbackModal({type: 'community-chat', name: document.getElementById('chat-room-title').textContent}), 500);
+        }
+
+        function populateMentors() {
+            const container = document.getElementById('mentor-list');
+            container.innerHTML = careerData.mentors.map(mentor => `
+                <div class="bg-gray-700/50 border border-gray-600 rounded-lg p-5 flex flex-col items-center text-center">
+                    <div class="text-5xl mb-3 p-4 bg-gray-800 rounded-full">${mentor.avatar}</div>
+                    <h3 class="font-bold text-lg text-gray-200">${mentor.name}</h3>
+                    <p class="text-indigo-400 text-sm mb-4">${mentor.expertise}</p>
+                    <div class="flex gap-3 mt-auto">
+                        <button onclick="handleMentorConnect('chat', '${mentor.name}')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg text-sm">Chat</button>
+                        <button onclick="handleMentorConnect('video', '${mentor.name}')" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg text-sm">Video Call</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleMentorConnect(type, mentorName) {
+            addActivity(`Attempted to connect with mentor: ${mentorName} (${type})`, '🤝');
+            const message = type === 'video' 
+                ? `Video call functionality is a demo. In a real app, this would open a video session with ${mentorName}.`
+                : `Live chat with mentors is a premium feature. This is a demo of the connection process with ${mentorName}.`;
+            showNotification(message, null, () => showFeedbackModal({type: `mentor-${type}`, name: mentorName}));
+        }
+        
+        // --- THEME FUNCTIONS ---
+        function handleThemeToggle(event) {
+            const isDarkMode = event.target.checked;
+            const body = document.body;
+            if (isDarkMode) {
+                body.classList.remove('light-theme');
+                localStorage.setItem('career-friend-theme', 'dark');
+            } else {
+                body.classList.add('light-theme');
+                localStorage.setItem('career-friend-theme', 'light');
+            }
+        }
+        
+        // --- LANGUAGE FUNCTIONS ---
+        function applyLanguage(lang) {
+            userState.language = lang;
+            localStorage.setItem('career-friend-language', lang);
+            // In a real app, you would have a full i18n library.
+            // For this demo, we will just show a notification and handle AI prompt language.
+            showNotification("Language preference saved. AI content will now be generated in your selected language.");
+        }
+        
+        function loadLanguage() {
+            const savedLang = localStorage.getItem('career-friend-language') || 'en-IN';
+            userState.language = savedLang;
+            document.getElementById('language-select').value = savedLang;
+        }
+
+
+        // --- INITIALIZE APP ---
+        document.addEventListener('DOMContentLoaded', () => {
+            populateClasses();
+            populateFeedback();
+            
+            // Theme initialization
+            const savedTheme = localStorage.getItem('career-friend-theme') || 'dark'; // Default to dark
+            const toggle = document.getElementById('dark-mode-toggle');
+            const body = document.body;
+            
+            if (savedTheme === 'light') {
+                body.classList.add('light-theme');
+                if(toggle) toggle.checked = false;
+            } else {
+                body.classList.remove('light-theme');
+                if(toggle) toggle.checked = true;
+            }
+            if(toggle) {
+                toggle.addEventListener('change', handleThemeToggle);
+            }
+
+            loadLanguage();
+            loadTasks();
+            loadHelpTickets();
+            checkDeadlines();
+        });
+
+    </script>
+</body>
+</html>
+
+
+
